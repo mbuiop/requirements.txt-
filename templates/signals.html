@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %}سیگنال‌ها{% endblock %}
+
+{% block content %}
+<div class="page-content">
+    <h1>سیستم سیگنال‌دهی</h1>
+    
+    {% if access_denied %}
+    <div class="access-denied">
+        <p>برای دسترسی به سیگنال‌ها، لطفاً ابتدا اقدام به واریز وجه کنید.</p>
+        <a href="{{ url_for('app_creator') }}" class="btn">رفته به صفحه پرداخت</a>
+    </div>
+    {% else %}
+    <div class="signals-container">
+        <h2>سیگنال‌های امروز</h2>
+        
+        {% if signals %}
+        <div class="signals-list">
+            {% for signal in signals %}
+            <div class="signal-card">
+                <div class="signal-header">
+                    <span class="symbol">{{ signal.symbol }}</span>
+                    <span class="action {{ signal.action|lower }}">{{ signal.action }}</span>
+                </div>
+                <div class="signal-details">
+                    <p>قیمت ورود: <strong>{{ signal.price }}</strong></p>
+                    <p>حد ضرر: <strong>{{ signal.sl }}</strong></p>
+                    <p>حد سود: <strong>{{ signal.tp }}</strong></p>
+                </div>
+                <div class="signal-time">
+                    {{ now.strftime('%Y-%m-%d %H:%M') }}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p>در حال حاضر سیگنالی موجود نیست.</p>
+        {% endif %}
+        
+        <div class="disclaimer">
+            <p><strong>تذکر مهم:</strong> این سیگنال‌ها با استفاده از پیشرفته‌ترین الگوریتم‌های جهان تولید شده‌اند، اما مسئولیت معاملات بر عهده کاربر است.</p>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
