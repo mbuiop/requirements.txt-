@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>پنل مدیریت</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="admin-panel">
+        <header>
+            <h1>پنل مدیریت</h1>
+            <a href="{{ url_for('index') }}" class="logout">خروج</a>
+        </header>
+        
+        <div class="admin-sections">
+            <!-- بخش تراکنش‌های در انتظار -->
+            <section class="pending-transactions">
+                <h2>تراکنش‌های در انتظار تأیید</h2>
+                
+                {% if pending_transactions %}
+                <table>
+                    <thead>
+                        <tr>
+                            <th>کاربر</th>
+                            <th>هش تراکنش</th>
+                            <th>مبلغ (دلار)</th>
+                            <th>تاریخ</th>
+                            <th>عملیات</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for transaction in pending_transactions %}
+                        <tr>
+                            <td>{{ transaction[1] }}</td>
+                            <td class="transaction-hash">{{ transaction[2] }}</td>
+                            <td>{{ transaction[3] }}</td>
+                            <td>{{ transaction[4] }}</td>
+                            <td>
+                                <button onclick="verifyTransaction({{ transaction[0] }}, 'approve')" class="btn-approve">تأیید</button>
+                                <button onclick="verifyTransaction({{ transaction[0] }}, 'reject')" class="btn-reject">رد</button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <p>هیچ تراکنشی در انتظار تأیید نیست.</p>
+                {% endif %}
+            </section>
+            
+            <!-- بخش ارسال پیام همگانی -->
+            <section class="announcement">
+                <h2>ارسال پیام همگانی</h2>
+                <form id="announcementForm" onsubmit="sendAnnouncement(event)">
+                    <div class="form-group">
+                        <textarea id="message" name="message" rows="4" required placeholder="متن پیام..."></textarea>
+                    </div>
+                    <button type="submit">ارسال پیام</button>
+                </form>
+                <div id="announcementMessage" class="hidden"></div>
+            </section>
+            
+            <!-- بخش مدیریت کاربران -->
+            <section class="user-management">
+                <h2>مدیریت کاربران</h2>
+                
+                {% if users %}
+                <table>
+                    <thead>
+                        <tr>
+                            <th>کاربر</th>
+                            <th>کد رفرال</th>
+                            <th>وضعیت پرداخت</th>
+                            <th>دسترسی اپ</th>
+                            <th>دسترسی سیگنال</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users %}
+                        <tr>
+                            <td>{{ user[0] }}</td>
+                            <td>{{ user[1] }}</td>
+                            <td>{{ 'تأیید شده' if user[2] else 'در انتظار' }}</td>
+                            <td>{{ 'فعال' if user[3] else 'غیرفعال' }}</td>
+                            <td>{{ 'فعال' if user[4] else 'غیرفعال' }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <p>هیچ کاربری ثبت نشده است.</p>
+                {% endif %}
+            </section>
+        </div>
+    </div>
+    
+    <script>
+    function verifyTransaction(transactionId, action) {
+        const formData = new FormData();
+        formData.append('transaction_id', transactionId);
+        formData.append('action', action);
+        
+        fetch('/admin/verify_transaction', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert(data.message);
+            if (data.success) {
+                location.reload();
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    }
+    
+    function sendAnnouncement(event) {
+        event.preventDefault();
+        const form = event.target;
+        const formData = new FormData(form);
+        
+        fetch('/admin/send_announcement', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            const messageDiv = document.getElementById('announcementMessage');
+            messageDiv.classList.remove('hidden');
+            messageDiv.textContent = data.message;
+            messageDiv.className = data.success ? 'success' : 'error';
+            
+            if (data.success) {
+                form.reset();
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    }
+    </script>
+</body>
+</html>
