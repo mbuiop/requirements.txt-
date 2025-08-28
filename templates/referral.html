@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}سیستم رفرال{% endblock %}
+
+{% block content %}
+<div class="page-content">
+    <h1>سیستم رفرال</h1>
+    <p>لینک رفرال منحصر به فرد شما:</p>
+    <div class="referral-box">
+        <input type="text" id="referralLink" value="{{ referral_link }}" readonly>
+        <button onclick="copyReferralLink()">کپی لینک</button>
+    </div>
+    <p>این لینک را با دوستان خود به اشتراک بگذارید و امتیاز دریافت کنید.</p>
+</div>
+
+<script>
+function copyReferralLink() {
+    const copyText = document.getElementById("referralLink");
+    copyText.select();
+    copyText.setSelectionRange(0, 99999);
+    document.execCommand("copy");
+    alert("لینک رفرال کپی شد: " + copyText.value);
+}
+</script>
+{% endblock %}
