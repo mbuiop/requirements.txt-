@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}سیستم مدیریت{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        {% block content %}{% endblock %}
+    </div>
+    
+    <!-- نوار ناوبری پایین صفحه -->
+    <nav class="bottom-nav">
+        <a href="{{ url_for('referral') }}" class="nav-item {% if request.path == '/referral' %}active{% endif %}">
+            <span>دریافت سیگنال</span>
+        </a>
+        <a href="{{ url_for('app_creator') }}" class="nav-item {% if request.path == '/app_creator' %}active{% endif %}">
+            <span>اپلیکیشن ساز</span>
+        </a>
+        <a href="{{ url_for('signals') }}" class="nav-item {% if request.path == '/signals' %}active{% endif %}">
+            <span>رفرال</span>
+        </a>
+    </nav>
+    
+    <!-- دکمه‌های مدیریت در چهار گوشه صفحه -->
+    <a href="{{ url_for('admin_login') }}" class="admin-btn top-left"></a>
+    <a href="{{ url_for('admin_login') }}" class="admin-btn top-right"></a>
+    <a href="{{ url_for('admin_login') }}" class="admin-btn bottom-left"></a>
+    <a href="{{ url_for('admin_login') }}" class="admin-btn bottom-right"></a>
+    
+    <script src="{{ url_for('static', filename='admin.js') }}"></script>
+</body>
+</html>
