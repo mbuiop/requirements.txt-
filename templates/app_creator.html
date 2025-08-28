@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}اپلیکیشن ساز{% endblock %}
+
+{% block content %}
+<div class="page-content">
+    <h1>اپلیکیشن ساز</h1>
+    
+    <div class="info-box">
+        <p>لطفاً مبلغ ۵۰ دلار به آدرس کیف پول زیر واریز کنید:</p>
+        <div class="wallet-address">
+            <strong>{{ wallet_address }}</strong>
+            <button onclick="copyWalletAddress()">کپی آدرس</button>
+        </div>
+        <p>پس از واریز، هش تراکنش خود را در فرم زیر وارد کنید.</p>
+    </div>
+    
+    <form id="transactionForm" onsubmit="submitTransaction(event)">
+        <div class="form-group">
+            <label for="transactionHash">هش تراکنش:</label>
+            <input type="text" id="transactionHash" name="transactionHash" required>
+        </div>
+        <button type="submit">ثبت تراکنش</button>
+    </form>
+    
+    <div id="message" class="hidden"></div>
+</div>
+
+<script>
+function copyWalletAddress() {
+    const text = "{{ wallet_address }}";
+    navigator.clipboard.writeText(text).then(() => {
+        alert("آدرس کیف پول کپی شد: " + text);
+    });
+}
+
+function submitTransaction(event) {
+    event.preventDefault();
+    const form = event.target;
+    const formData = new FormData(form);
+    
+    fetch('/submit_transaction', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        const messageDiv = document.getElementById('message');
+        messageDiv.classList.remove('hidden');
+        messageDiv.textContent = data.message;
+        messageDiv.className = data.success ? 'success' : 'error';
+        
+        if (data.success) {
+            form.reset();
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+}
+</script>
+{% endblock %}
